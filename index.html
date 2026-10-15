@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fc">
+<meta name="description" content="儿童空间想象力练习：根据立方体磁力积木的顶视图、前视图和左视图，想象并查看立体拼搭答案。">
+<title>空间积木 · 三视图挑战</title>
+<style>
+:root{--ink:#242b47;--muted:#8590a8;--bg:#f6f7fc;--border:#e9ebf5;--purple:#6f63ec;--purple-dark:#5146cb;--sky:#41b9ea;--card:#fff;--shadow:0 6px 22px rgba(37,46,93,.055)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;height:100dvh;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font-family:ui-rounded,"SF Pro Rounded","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+button{font:inherit;cursor:pointer;touch-action:manipulation}
+.app{position:relative;display:flex;flex-direction:column;gap:10px;max-width:690px;margin:0 auto;padding: max(12px,env(safe-area-inset-top)) 13px max(12px,env(safe-area-inset-bottom));height:100%;height:100dvh;min-height:0}
+.header{display:flex;gap:11px;align-items:center;flex:0 0 auto;min-height:51px}
+.brand{display:grid;place-items:center;width:46px;height:46px;border-radius:16px;background:linear-gradient(145deg,#7969f9,#a893ff);box-shadow:0 7px 14px #786af32c;flex:0 0 auto}
+.brand svg{width:29px;height:29px}
+h1{font-size:19px;letter-spacing:-.45px;line-height:1.15;margin:0 0 5px;font-weight:860}
+.header p{font-size:11.5px;line-height:1.2;letter-spacing:.15px;color:var(--muted);margin:0}
+.header .spark{margin-left:auto;white-space:nowrap;border-radius:99px;padding:7px 10px;background:#edeaff;color:#7668df;font-size:10px;font-weight:800}
+.level-area{display:flex;align-items:center;gap:10px;flex:0 0 auto;min-height:41px}
+.level-title{white-space:nowrap;font-size:12px;font-weight:800;color:#6c7793;padding-left:2px}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-radius:14px;background:#ebeef7;padding:4px;flex:1;min-width:0}
+.level{border:0;background:transparent;color:#7c88a1;font-size:13px;font-weight:800;border-radius:11px;padding:8px 3px;transition:background .17s,color .17s,transform .15s}
+.level:active{transform:scale(.97)}
+.level[aria-pressed="true"]{background:#fff;color:var(--purple-dark);box-shadow:0 2px 8px #29336b14}
+.board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1.13fr) minmax(0,.87fr);gap:10px;flex:1;min-height:0}
+.view{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;min-width:0;min-height:0;position:relative}
+.view.top{grid-column:1 / -1}
+.view-head{display:flex;align-items:center;justify-content:space-between;padding:13px 15px 0;gap:4px;flex:0 0 auto}
+.view-name{display:flex;gap:7px;align-items:center;font-weight:850;font-size:14px;white-space:nowrap}
+.icon-box{border-radius:9px;width:25px;height:25px;display:grid;place-items:center;flex:0 0 auto}
+.icon-box svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.top .icon-box{background:#eaf9fe;color:#2dabe2}.front .icon-box{background:#f2edff;color:#8c65ee}.side .icon-box{background:#fff4e7;color:#f5a446}
+.view-sub{font-size:9px;letter-spacing:1px;font-weight:850;color:#b0b9ca;white-space:nowrap}
+.view-canvas{flex:1;min-height:0;position:relative;margin:2px 7px 6px}
+.view-canvas:before{content:"";position:absolute;inset:5px;border-radius:12px;background-image:radial-gradient(#e7eaf5 1px,transparent 1px);background-size:16px 16px;opacity:.55;pointer-events:none}
+.view-canvas canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.axis-hint{position:absolute;right:11px;bottom:9px;pointer-events:none;color:#97a2ba;font-size:10px;font-weight:800;letter-spacing:.2px;background:#ffffffd9;border-radius:6px;padding:2px 4px}
+.footer{display:flex;gap:11px;flex:0 0 auto;padding-top:2px}
+.action{height:54px;min-width:0;border-radius:15px;font-size:15px;font-weight:850;border:0;display:flex;align-items:center;justify-content:center;gap:9px;transition:transform .16s,filter .16s}
+.action:active{transform:scale(.97)}
+.action svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.shuffle{flex:1;background:#fff;color:#6455d5;border:1.5px solid #dfdcfa;box-shadow:0 3px 10px #5341a708}
+.reveal{flex:1.08;background:linear-gradient(110deg,#7969f4,#6556da);color:white;box-shadow:0 8px 18px #6b5de633}
+.modal{position:fixed;z-index:20;inset:0;background:rgba(32,37,67,.58);display:none;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal.open{display:flex}
+.answer{width:min(100%,650px);height:min(94dvh,900px);background:linear-gradient(170deg,#fff 0%,#f9faff 85%);border:1px solid #eeeff9;border-radius:25px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px #11153645;padding:19px 16px 16px;min-height:0}
+.answer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex:0 0 auto}
+.answer-overline{color:#8272e8;font-weight:900;font-size:11px;letter-spacing:2px;margin:0 0 6px}
+.answer h2{font-size:22px;letter-spacing:-.5px;margin:0;font-weight:900}
+.answer-head .close{border:0;background:#f0f1f8;color:#626c83;width:35px;height:35px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;font-size:23px;line-height:1}
+.viewer{flex:1;min-height:0;position:relative;margin:10px 0 4px;border-radius:19px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#fff 7%,#f3f4fe 75%,#edf0fb 100%)}
+.viewer canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+.viewer canvas:active{cursor:grabbing}
+.viewer-tag{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:99px;background:#ffffffdc;border:1px solid #eeeff7;color:#797f99;font-size:10px;font-weight:850;pointer-events:none}
+.viewer-hint{position:absolute;left:50%;transform:translateX(-50%);bottom:15px;font-size:11px;white-space:nowrap;color:#838eaa;background:#ffffffde;padding:7px 12px;border-radius:99px;pointer-events:none}
+.legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;flex:0 0 auto;padding:5px 0 12px}
+.legend-item{display:flex;flex-direction:column;align-items:center;gap:4px;background:#f2f4fa;border-radius:12px;padding:9px 3px;font-size:10px;font-weight:750;color:#7d869f;text-align:center;white-space:nowrap}
+.legend-item b{font-size:13px}.legend-item:nth-child(1) b{color:#ef6d72}.legend-item:nth-child(2) b{color:#36a5dd}.legend-item:nth-child(3) b{color:#7c65e8}
+.answer-actions{display:flex;gap:10px;flex:0 0 auto}
+.answer-actions button{border:0;border-radius:13px;height:47px;font-weight:850;font-size:13px}
+.reset-view{background:#ebedf7;color:#57627d;flex:.9}.next{flex:1.2;color:white;background:linear-gradient(110deg,#7c70f3,#6754d9)}
+@media(min-width:620px){.app{padding-left:20px;padding-right:20px;gap:13px}.board{gap:14px}.view-head{padding-top:15px}.view-name{font-size:16px}.view-canvas{margin:5px 12px 10px}.action{height:58px}.header{min-height:58px}h1{font-size:22px}}
+@media(max-height:680px){.app{gap:7px;padding-top:max(7px,env(safe-area-inset-top));padding-bottom:max(7px,env(safe-area-inset-bottom))}.header{min-height:42px}.brand{width:39px;height:39px;border-radius:12px}.brand svg{width:24px;height:24px}h1{font-size:17px;margin-bottom:3px}.header p{font-size:10px}.level-area{min-height:36px}.level{padding:6px 2px}.board{gap:7px}.view{border-radius:16px}.view-head{padding:8px 10px 0}.view-name{font-size:12px}.icon-box{width:22px;height:22px;border-radius:8px}.view-sub{font-size:8px}.footer .action{height:46px;font-size:13px;border-radius:12px}.answer{height:97dvh}}
+@media(max-width:350px){.header .spark{display:none}.view-sub{display:none}.view-head{padding-left:9px;padding-right:9px}.axis-hint{font-size:9px;right:6px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app" aria-label="积木三视图空间想象游戏">
+  <header class="header">
+    <div class="brand" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M20 4 34 11.8v16.4L20 36 6 28.2V11.8L20 4Z" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/><path d="M6 12 20 20 34 12M20 20v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><path d="m13 8 14 8" stroke="#fff" stroke-width="2" opacity=".5"/></svg></div>
+    <div><h1>空间积木挑战</h1><p>观察三个方向，想象立体的模样</p></div>
+    <div class="spark">空间想象力</div>
+  </header>
+  <div class="level-area"><span class="level-title">选择难度</span><div class="levels" role="group" aria-label="选择游戏难度"><button class="level" data-level="easy" aria-pressed="true">易 · 入门</button><button class="level" data-level="medium" aria-pressed="false">中 · 进阶</button><button class="level" data-level="hard" aria-pressed="false">难 · 挑战</button></div></div>
+  <section class="board" aria-label="需要观察的三个正交视图">
+    <article class="view top" aria-label="顶视图"><div class="view-head"><div class="view-name"><span class="icon-box"><svg viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="15" rx="2.2"/><path d="M12 5v14M5 12h14"/></svg></span>顶视图</div><span class="view-sub">TOP VIEW</span></div><div class="view-canvas"><canvas id="topView" aria-label="从正上方观察的积木图形"></canvas><span class="axis-hint">X →　Y ↑</span></div></article>
+    <article class="view front" aria-label="前视图"><div class="view-head"><div class="view-name"><span class="icon-box"><svg viewBox="0 0 24 24"><path d="M4 19V5h16v14H4Z"/><path d="M11.9 5v14M4 12h16"/></svg></span>前视图</div><span class="view-sub">FRONT</span></div><div class="view-canvas"><canvas id="frontView" aria-label="从前方观察的积木图形"></canvas><span class="axis-hint">X →　Z ↑</span></div></article>
+    <article class="view side" aria-label="左视图"><div class="view-head"><div class="view-name"><span class="icon-box"><svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/><path d="M5 12h14M12 5v14"/></svg></span>左视图</div><span class="view-sub">LEFT</span></div><div class="view-canvas"><canvas id="leftView" aria-label="从左侧观察的积木图形"></canvas><span class="axis-hint">Y ←　Z ↑</span></div></article>
+  </section>
+  <footer class="footer"><button id="shuffle" class="action shuffle" type="button"><svg viewBox="0 0 24 24"><path d="M4 7h3a5 5 0 0 1 4.5 2.5l1 1.5A5 5 0 0 0 17 13h3m-3-3 3 3-3 3M4 17h3a5 5 0 0 0 4.5-2.5m1-5A5 5 0 0 1 17 7h3m-3-3 3 3-3 3"/></svg>随机打乱</button><button id="show" class="action reveal" type="button"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.4-6.2 9.5-6.2 9.5 6.2 9.5 6.2-3.4 6.2-9.5 6.2S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg>显示结果</button></footer>
+</main>
+<div class="modal" id="modal" aria-hidden="true"><section class="answer" role="dialog" aria-modal="true" aria-labelledby="answerTitle"><div class="answer-head"><div><p class="answer-overline">空间答案 · 立体观察</p><h2 id="answerTitle">原来是这样拼的！</h2></div><button id="close" class="close" aria-label="关闭结果" type="button">×</button></div><div class="viewer"><canvas id="threeView" aria-label="可用手指拖动旋转的三维正交立方体模型"></canvas><div class="viewer-tag">正交三维视角</div><div class="viewer-hint">左右拖动旋转 · 上下可自由翻转</div></div><div class="legend"><div class="legend-item"><b>X 轴</b><span>左 ↔ 右</span></div><div class="legend-item"><b>Y 轴</b><span>前 ↔ 后</span></div><div class="legend-item"><b>Z 轴</b><span>下 ↔ 上</span></div></div><div class="answer-actions"><button id="reset" class="reset-view" type="button">重置视角</button><button id="again" class="next" type="button">再来一题 →</button></div></section></div>
+<div id="announce" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap"></div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s);
+const canvases={top:$('#topView'),front:$('#frontView'),left:$('#leftView'),three:$('#threeView')};
+const palette=['#FC797B','#FFB64C','#45BCED','#8D78F9','#4CCF9B','#F58FC8','#77B8F6','#B7C85A'];
+const levels={easy:{min:5,max:10,width:4,height:3},medium:{min:10,max:15,width:5,height:4},hard:{min:15,max:20,width:6,height:5}};
+let difficulty='easy',blocks=[],map=new Map(),seed=0,yaw=-.93,pitch=.64,renderQueued=false;
+const key=(x,y,z)=>x+','+y+','+z;
+const present=(x,y,z)=>map.has(key(x,y,z));
+const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+const choice=(items)=>items[Math.floor(Math.random()*items.length)];
+const rgb=(s)=>[parseInt(s.slice(1,3),16),parseInt(s.slice(3,5),16),parseInt(s.slice(5,7),16)];
+const tint=(hex,amount)=>{const c=rgb(hex);return `rgb(${c.map(v=>Math.round(v+(amount>0?(255-v):v)*amount)).join(',')})`};
+function bounds(){return {minX:Math.min(...blocks.map(b=>b.x)),maxX:Math.max(...blocks.map(b=>b.x)),minY:Math.min(...blocks.map(b=>b.y)),maxY:Math.max(...blocks.map(b=>b.y)),maxZ:Math.max(...blocks.map(b=>b.z))}}
+function color(b){let n=((b.x*131+b.y*79+b.z*53+seed*17)>>>0);n=(n^(n>>>9))*2654435761>>>0;return palette[n%palette.length]}
+function candidateMap(config){
+ const out=new Map(), bnd=bounds();
+ function propose(x,y,z,type,weight){
+  if(present(x,y,z)||z<0||z>=config.height)return;
+  const minX=Math.min(bnd.minX,x),maxX=Math.max(bnd.maxX,x),minY=Math.min(bnd.minY,y),maxY=Math.max(bnd.maxY,y);
+  if(maxX-minX+1>config.width||maxY-minY+1>config.width)return;
+  // 悬挑的下方始终保持空缺，不允许后来在其下方补柱形成误判。
+  for(let height=z+1;height<config.height;height++){const above=map.get(key(x,y,height));if(above&&above.type==='wing')return;}
+  let touching=0;
+  for(const [dx,dy] of dirs){if(present(x+dx,y+dy,z))touching++;}
+  const k=key(x,y,z),prev=out.get(k);
+  let score=weight*(1+.22*Math.max(0,touching-1));
+  if(prev&&prev.weight>=score)return;
+  out.set(k,{x,y,z,type,weight:score});
+ }
+ for(const b of blocks){
+  if(b.z===0){for(const [dx,dy] of dirs){propose(b.x+dx,b.y+dy,0,'solid',1.9)}}
+  if(b.type!=='wing'){
+   propose(b.x,b.y,b.z+1,'solid',3.25);
+   if(b.z>0&&present(b.x,b.y,b.z-1)){
+    for(const [dx,dy] of dirs){const x=b.x+dx,y=b.y+dy;
+     if(!present(x,y,b.z-1))propose(x,y,b.z,'wing',.92);
+    }
+   }
+  }
+ }
+ return [...out.values()].filter(c=>{
+  if(c.type==='solid'&&c.z>0){const below=map.get(key(c.x,c.y,c.z-1));return below&&below.type!=='wing';}
+  if(c.type==='wing'){return c.z>0&&!present(c.x,c.y,c.z-1)&&dirs.some(([dx,dy])=>{
+   const a=map.get(key(c.x+dx,c.y+dy,c.z));return a&&a.type==='solid'&&present(a.x,a.y,a.z-1);
+  })}
+  return true;
+ });
+}
+function attempt(config,target){
+ blocks=[{x:0,y:0,z:0,type:'solid'}];map=new Map([[key(0,0,0),blocks[0]]]);
+ for(let i=1;i<target;i++){
+  const possibilities=candidateMap(config);if(!possibilities.length)return false;
+  const sum=possibilities.reduce((s,c)=>s+c.weight,0);
+  let n=Math.random()*sum,selected=possibilities[possibilities.length-1];
+  for(const c of possibilities){n-=c.weight;if(n<=0){selected=c;break}}
+  const cube={x:selected.x,y:selected.y,z:selected.z,type:selected.type};
+  blocks.push(cube);map.set(key(cube.x,cube.y,cube.z),cube);
+ }
+ const b=bounds();
+ return b.maxZ >=(difficulty==='easy'?1:2) && (b.maxX>b.minX||b.maxY>b.minY) && (difficulty!=='hard'||blocks.some(c=>c.type==='wing'));
+}
+function validate(){
+ if(blocks.length>20||blocks.length<levels[difficulty].min||blocks.length>levels[difficulty].max)throw Error('difficulty bounds invalid');
+ for(const b of blocks){if(b.z===0)continue;
+  if(b.type==='wing'){
+   if(present(b.x,b.y,b.z-1)||!dirs.some(([dx,dy])=>{const near=map.get(key(b.x+dx,b.y+dy,b.z));return near&&near.type==='solid'&&present(near.x,near.y,near.z-1)}))throw Error('wing invalid');
+   if(present(b.x,b.y,b.z+1))throw Error('cube on overhang');
+  }else{const under=map.get(key(b.x,b.y,b.z-1));if(!under||under.type==='wing')throw Error('unsupported cube')}
+ }
+}
+function generate(){
+ const cfg=levels[difficulty],target=cfg.min+Math.floor(Math.random()*(cfg.max-cfg.min+1));
+ seed=Math.floor(Math.random()*10000);
+ let ok=false;for(let i=0;i<180&&!ok;i++)ok=attempt(cfg,target);
+ if(!ok){ // 极端随机情况下，降级为合法的连续填充。
+   blocks=[{x:0,y:0,z:0,type:'solid'}];map=new Map([[key(0,0,0),blocks[0]]]);
+   while(blocks.length<target){const candidates=candidateMap(cfg);const c=choice(candidates);const cube={x:c.x,y:c.y,z:c.z,type:c.type};blocks.push(cube);map.set(key(cube.x,cube.y,cube.z),cube)}
+ }
+ validate();closeModal();drawAll();$('#announce').textContent='已生成新的三视图挑战';
+}
+function setupCanvas(canvas){
+ const rect=canvas.getBoundingClientRect();const width=Math.max(1,rect.width),height=Math.max(1,rect.height),dpr=Math.min(devicePixelRatio||1,2.5);
+ const pxW=Math.round(width*dpr),pxH=Math.round(height*dpr);
+ if(canvas.width!==pxW||canvas.height!==pxH){canvas.width=pxW;canvas.height=pxH;}
+ const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
+ return {ctx,w:width,h:height};
+}
+function roundRect(ctx,x,y,w,h,r){r=Math.min(r,w/3,h/3);ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function drawProjection(kind){
+ const {ctx,w,h}=setupCanvas(canvases[kind]);if(!blocks.length)return;
+ const b=bounds(),cols=kind==='front'?b.maxX-b.minX+1:kind==='left'?b.maxY-b.minY+1:b.maxX-b.minX+1;
+ const rows=kind==='top'?b.maxY-b.minY+1:b.maxZ+1;
+ const cells=new Map();
+ const order=kind==='top'?blocks.slice().sort((a,c)=>a.z-c.z):kind==='front'?blocks.slice().sort((a,c)=>c.y-a.y):blocks.slice().sort((a,c)=>c.x-a.x);
+ for(const cube of order){
+  const col=kind==='left'?b.maxY-cube.y:cube.x-b.minX;
+  const row=kind==='top'?b.maxY-cube.y:b.maxZ-cube.z;
+  cells.set(col+','+row,cube);
+ }
+ const padX=kind==='top'?31:13,padY=kind==='top'?14:9;
+ const size=Math.max(3,Math.min((w-2*padX)/(cols+.15),(h-2*padY)/(rows+.15),kind==='top'?65:53));
+ const ox=(w-cols*size)/2,oy=(h-rows*size)/2-(kind==='top'?0:1);
+ const gap=Math.max(1.2,Math.min(2.4,size*.065));
+ // 辅助网格，让缺失位置依然有清晰的空间坐标。
+ for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){
+  const x=ox+col*size,y=oy+row*size;
+  roundRect(ctx,x+gap,y+gap,size-2*gap,size-2*gap,Math.min(5,size*.13));
+  ctx.fillStyle='rgba(231,235,247,.50)';ctx.fill();
+  ctx.strokeStyle='rgba(221,226,241,.66)';ctx.lineWidth=.85;ctx.stroke();
+ }
+ for(const [pos,cube] of cells){
+  const [col,row]=pos.split(',').map(Number),x=ox+col*size+gap,y=oy+row*size+gap,s=size-gap*2;
+  const base=color(cube),radius=Math.max(3,Math.min(8,size*.17));
+  ctx.save();ctx.shadowColor='rgba(49,61,104,.14)';ctx.shadowBlur=Math.min(8,size*.15);ctx.shadowOffsetY=2;
+  roundRect(ctx,x,y,s,s,radius);ctx.fillStyle=base;ctx.fill();ctx.restore();
+  roundRect(ctx,x+.5,y+.5,s-1,s-1,radius);ctx.strokeStyle='rgba(255,255,255,.92)';ctx.lineWidth=Math.max(1.1,size*.055);ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.20)';roundRect(ctx,x+s*.12,y+s*.10,s*.75,s*.23,Math.max(2,s*.08));ctx.fill();
+ }
+}
+const vdot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const faces=[
+ {normal:[1,0,0],offset:[1,0,0],verts:[[1,0,0],[1,1,0],[1,1,1],[1,0,1]],shade:-.17},
+ {normal:[-1,0,0],offset:[-1,0,0],verts:[[0,0,0],[0,0,1],[0,1,1],[0,1,0]],shade:-.14},
+ {normal:[0,1,0],offset:[0,1,0],verts:[[0,1,0],[0,1,1],[1,1,1],[1,1,0]],shade:-.11},
+ {normal:[0,-1,0],offset:[0,-1,0],verts:[[0,0,0],[1,0,0],[1,0,1],[0,0,1]],shade:-.06},
+ {normal:[0,0,1],offset:[0,0,1],verts:[[0,0,1],[1,0,1],[1,1,1],[0,1,1]],shade:.16},
+ {normal:[0,0,-1],offset:[0,0,-1],verts:[[0,0,0],[0,1,0],[1,1,0],[1,0,0]],shade:-.24}
+];
+function drawThree(){
+ if(!$('#modal').classList.contains('open'))return;
+ const {ctx,w,h}=setupCanvas(canvases.three),b=bounds();
+ const camera=[Math.cos(pitch)*Math.cos(yaw),Math.cos(pitch)*Math.sin(yaw),Math.sin(pitch)];
+ const right=[-Math.sin(yaw),Math.cos(yaw),0],up=[-Math.sin(pitch)*Math.cos(yaw),-Math.sin(pitch)*Math.sin(yaw),Math.cos(pitch)];
+ // 以所有积木的几何中心为固定旋转轴心，而不是随视角变化的投影边框中心。
+ // 所有旋转角度共享同一缩放比例，防止模型在拖动时平移或忽大忽小。
+ const center=[0,0,0];
+ for(const q of blocks){center[0]+=q.x+.5;center[1]+=q.y+.5;center[2]+=q.z+.5;}
+ for(let i=0;i<3;i++)center[i]/=blocks.length;
+ const raw=p=>{const v=p.map((n,i)=>n-center[i]);return [vdot(v,right),-vdot(v,up)]};
+ const origin=[b.minX-.62,b.minY-.62,-.28],axisLen=Math.min(1.45,Math.max(1.05,(b.maxZ+1)*.36));
+ const axisEnds=[[origin[0]+axisLen,origin[1],origin[2]],[origin[0],origin[1]+axisLen,origin[2]],[origin[0],origin[1],origin[2]+axisLen]];
+ let radius=0;
+ for(const q of blocks)for(let dx=0;dx<=1;dx++)for(let dy=0;dy<=1;dy++)for(let dz=0;dz<=1;dz++){
+  const x=q.x+dx-center[0],y=q.y+dy-center[1],z=q.z+dz-center[2];
+  radius=Math.max(radius,Math.hypot(x,y,z));
+ }
+ const margin=Math.min(40,w*.10),topMargin=47,bottomMargin=53;
+ const scale=Math.max(5,Math.min((w-2*margin)/(2*radius),(h-topMargin-bottomMargin)/(2*radius),87));
+ const offsetX=w/2,offsetY=(topMargin+h-bottomMargin)/2;
+ const project=p=>{const a=raw(p);return [a[0]*scale+offsetX,a[1]*scale+offsetY]};
+ // 地面参考线与拼搭底面平行。
+ ctx.save();ctx.strokeStyle='rgba(156,168,207,.13)';ctx.lineWidth=.8;
+ for(let x=b.minX-1;x<=b.maxX+2;x++){
+  const a=project([x,b.minY-.7,-.10]),z=project([x,b.maxY+1.7,-.10]);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...z);ctx.stroke();
+ }
+ for(let y=b.minY-1;y<=b.maxY+2;y++){
+  const a=project([b.minX-.7,y,-.10]),z=project([b.maxX+1.7,y,-.10]);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...z);ctx.stroke();
+ }
+ ctx.restore();
+ // 正交投影：只绘制朝向观察者且没有邻块遮挡的外表面。
+ const polys=[];
+ for(const q of blocks){for(const f of faces){
+  const [dx,dy,dz]=f.offset;if(present(q.x+dx,q.y+dy,q.z+dz)||vdot(f.normal,camera)<=.0001)continue;
+  const world=f.verts.map(p=>[q.x+p[0],q.y+p[1],q.z+p[2]]);
+  const facecenter=[q.x+.5+dx*.5,q.y+.5+dy*.5,q.z+.5+dz*.5];
+  polys.push({depth:vdot(facecenter,camera),points:world.map(project),fill:tint(color(q),f.shade)});
+ }}
+ polys.sort((a,c)=>a.depth-c.depth);
+ for(const p of polys){ctx.beginPath();ctx.moveTo(...p.points[0]);for(let i=1;i<p.points.length;i++)ctx.lineTo(...p.points[i]);ctx.closePath();ctx.fillStyle=p.fill;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.86)';ctx.lineJoin='round';ctx.lineWidth=Math.max(1,Math.min(2.1,scale*.038));ctx.stroke()}
+ const styles=[{label:'X',color:'#f17780'},{label:'Y',color:'#37ade1'},{label:'Z',color:'#8771e8'}];
+ const from=project(origin);
+ axisEnds.forEach((p,i)=>{
+  const to=project(p),dx=to[0]-from[0],dy=to[1]-from[1],d=Math.hypot(dx,dy);if(d<1)return;
+  const ux=dx/d,uy=dy/d,c=styles[i].color;
+  ctx.save();ctx.lineWidth=2.8;ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(...from);ctx.lineTo(...to);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(to[0],to[1]);ctx.lineTo(to[0]-ux*9-uy*4,to[1]-uy*9+ux*4);ctx.lineTo(to[0]-ux*9+uy*4,to[1]-uy*9-ux*4);ctx.closePath();ctx.fill();
+  const lx=to[0]+ux*12,ly=to[1]+uy*12;ctx.font='900 15px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=4;ctx.strokeStyle='#fff';ctx.strokeText(styles[i].label,lx,ly);ctx.fillText(styles[i].label,lx,ly);ctx.restore();
+ });
+ // 标记 XYZ 交点，避免出现独立漂浮箭头。
+ ctx.fillStyle='#7783a0';ctx.beginPath();ctx.arc(from[0],from[1],3,0,Math.PI*2);ctx.fill();
+}
+function drawAll(){drawProjection('top');drawProjection('front');drawProjection('left');if($('#modal').classList.contains('open'))drawThree()}
+function scheduleDraw(){if(renderQueued)return;renderQueued=true;requestAnimationFrame(()=>{renderQueued=false;drawAll()})}
+function openModal(){yaw=-.93;pitch=.64;$('#modal').classList.add('open');$('#modal').setAttribute('aria-hidden','false');drawThree();$('#close').focus({preventScroll:true})}
+function closeModal(){$('#modal').classList.remove('open');$('#modal').setAttribute('aria-hidden','true')}
+$('#shuffle').addEventListener('click',generate);$('#show').addEventListener('click',openModal);$('#close').addEventListener('click',()=>{closeModal();$('#show').focus({preventScroll:true})});
+$('#reset').addEventListener('click',()=>{yaw=-.93;pitch=.64;drawThree()});$('#again').addEventListener('click',generate);
+$('.modal').addEventListener('click',e=>{if(e.target===$('.modal'))closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modal').classList.contains('open'))closeModal()});
+document.querySelectorAll('[data-level]').forEach(btn=>btn.addEventListener('click',()=>{
+ difficulty=btn.dataset.level;document.querySelectorAll('[data-level]').forEach(t=>t.setAttribute('aria-pressed',String(t===btn)));generate();
+}));
+let drag=null;const cv=canvases.three;
+cv.addEventListener('pointerdown',e=>{drag={id:e.pointerId,x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;yaw-=dx*.012;pitch=(pitch+dy*.008)%(Math.PI*2);drawThree()});
+cv.addEventListener('pointerup',()=>{drag=null});cv.addEventListener('pointercancel',()=>{drag=null});
+if(typeof ResizeObserver!=='undefined'){const ro=new ResizeObserver(scheduleDraw);Object.values(canvases).forEach(c=>ro.observe(c))}
+window.addEventListener('resize',scheduleDraw);window.addEventListener('orientationchange',scheduleDraw);
+generate();
+})();
+</script>
+</body>
+</html>
